@@ -1,6 +1,5 @@
-// SustainIQ Bengaluru | Author: Vanshika Sharma
 import { createServer } from "node:http";
-import { randomUUID, timingSafeEqual } from "node:crypto";
+import { randomUUID } from "node:crypto";
 import { readFile, stat } from "node:fs/promises";
 import { resolve, extname, sep } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -9,7 +8,6 @@ import { wards } from "../shared/wards.js";
 import { CATEGORIES, STATUSES } from "../shared/constants.js";
 
 const db = openDatabase(process.env.DB_PATH || "./data/reports.sqlite");
-const adminToken = process.env.ADMIN_TOKEN || "";
 const dist = fileURLToPath(new URL("../dist/", import.meta.url));
 const port = Number(process.env.PORT || 3001);
 const host = process.env.HOST || "127.0.0.1";
@@ -70,20 +68,6 @@ async function body(req) {
 function exactFields(value, allowed) {
   if (Object.keys(value).some((key) => !allowed.includes(key)))
     throw new HttpError(400, "Request contains unsupported fields.");
-}
-function authorize(req) {
-  if (!adminToken)
-    throw new HttpError(
-      503,
-      "Administrator updates are disabled. Configure ADMIN_TOKEN on the server.",
-    );
-  const received = Buffer.from(req.headers.authorization || "");
-  const expected = Buffer.from(`Bearer ${adminToken}`);
-  if (
-    received.length !== expected.length ||
-    !timingSafeEqual(received, expected)
-  )
-    throw new HttpError(401, "A valid administrator token is required.");
 }
 function getReport(id) {
   const report = db.prepare("SELECT * FROM reports WHERE id = ?").get(id);
@@ -195,7 +179,6 @@ async function handleApi(req, res, url) {
     return json(res, 200, { deleted: match[1] });
   }
   if (match && match[2] && req.method === "PATCH") {
-    authorize(req);
     const input = await body(req);
     exactFields(input, ["status"]);
     if (!STATUSES.includes(input.status))
@@ -286,8 +269,6 @@ server.requestTimeout = 15000;
 server.headersTimeout = 10000;
 server.listen(port, host, () => {
   console.log(`SustainIQ listening on http://${host}:${server.address().port}`);
-  if (!adminToken)
-    console.warn("ADMIN_TOKEN is unset; status updates are disabled.");
 });
 function shutdown() {
   server.close(() => {
