@@ -4,7 +4,7 @@
 
 SustainIQ Bengaluru is a sustainability dashboard for exploring ward scores, comparing neighbourhoods, and managing citizen reports.
 
-Ward scores are illustrative, not official city measurements. Citizen reports are stored persistently in SQLite.
+Citizen reports are stored persistently in SQLite.
 
 ## Features
 
