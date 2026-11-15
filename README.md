@@ -15,7 +15,7 @@ Ward scores are illustrative, not official city measurements. Citizen reports ar
 
 ## Technology
 
-React and Vite for the frontend, Node.js 24's built-in HTTP server for the backend, and `node:sqlite` for storage.
+React for the frontend, Node.js 24's built-in HTTP server for the backend, and `node:sqlite` for storage.
 
 ## Setup
 
@@ -53,7 +53,6 @@ npm run server
 npm run dev
 ```
 
-Open the Vite URL shown in the terminal, normally **http://127.0.0.1:5173**. Vite proxies `/api` requests to the backend on port 3001. Restart the backend after changing server code. On Windows, use `npm.cmd` in place of `npm`.
 
 ## Configuration
 
